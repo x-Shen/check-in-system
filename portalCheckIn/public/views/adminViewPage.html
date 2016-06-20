@@ -1,0 +1,27 @@
+<div>
+    <div style="margin-top: 5px;">
+        <button type="button" ng-click ="openAdd()" class="btn btn-default">Add</button>
+        <button type="button" ng-click="openAlert()" class="btn btn-warning">Alert</button>
+        <button type="button" ng-click ="openView()" class="btn btn-default">Employee List</button>
+        <button type="button" ng-click ="logOut()" class="btn btn-danger">Log Out</button>
+    </div>
+</div>
+<div data-ng-init="init()">
+    <label>Search: <input ng-model="searchText2"></label>
+    <table class="table table-striped table-hover">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Last Check-In</th>
+            <th>Last Check-Out</th>
+            <th>Duration</th>
+        </tr>
+        <tr ng-repeat="u in userList| filter:searchText2 | orderBy: u.time[u.time.length - 1].checkin" ng-if="u.time[u.time.length - 1].checkin != undefined">
+            <td contenteditable="false">{{u.name}}</td>
+            <td contenteditable="false">{{u.time[u.time.length - 1].checkin}}</td>
+            <td contenteditable="false">{{u.time[u.time.length - 1].checkout}}</td>
+            <td contenteditable="false">{{    {checkout : u.time[u.time.length - 1].checkout, checkin:  u.time[u.time.length - 1].checkin} | duration }}</td>
+        </tr>
+        </thead>
+    </table>
+</div>
