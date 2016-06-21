@@ -45,7 +45,7 @@ appLogin.config(function($stateProvider, $urlRouterProvider) {
              controller: 'adminController'
         })
         .state('adminLogin', {
-            url: '/adminlogin',
+            url: '/login',
             templateUrl: 'views/admin.html',
             controller : 'loginController'
         })
@@ -68,5 +68,3 @@ appLogin.config(function($stateProvider, $urlRouterProvider) {
             templateUrl : '/views/checkin_confirmation.html'
         })
 });
-
-
