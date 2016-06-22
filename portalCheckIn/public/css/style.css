@@ -67,14 +67,14 @@
     height: 80px;
     width: 30%;
     font-size: 16pt;
-    /*margin-left: 15%;*/
+    margin-left: 35%;
 }
 
 #inputBoxStyle3 {
     height: 80px;
     width: 30%;
     font-size: 16pt;
-    /*margin-left: 15%;*/
+    margin-left: 35%;
 }
 
 .biggerFont {
@@ -135,6 +135,6 @@ label{
     margin: auto;
 }
 .adminText{
-    /*margin-left: 15%;*/
+    margin-left: 35%;
     padding-bottom: 5px;
 }

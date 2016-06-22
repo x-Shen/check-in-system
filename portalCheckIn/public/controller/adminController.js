@@ -22,6 +22,7 @@ appLogin.controller("adminController", ['$scope','$http', '$modal', '$state', 'C
         if(CheckInService.getToken() == undefined) {
             $state.go('adminLogin');
         } else {
+            console.log(CheckInService.getToken());
             $http.get('/admins/viewUsers?token=' + CheckInService.getToken()).then(function (res) {
                 $scope.userList = res.data;
                 sortDates($scope.userList);
