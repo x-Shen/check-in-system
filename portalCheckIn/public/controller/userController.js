@@ -3,7 +3,7 @@ appLogin.controller("userController", ['$scope','$http', function($scope, $http)
     $scope.loginUser = function(){
         if(typeof($scope.checkin) == "number"){
             $http.post("/users/checkin", {
-                student_id: $scope.checkin});
+                studentId: $scope.checkin});
         }
 
         else if(typeof($scope.checkin) == "string"){

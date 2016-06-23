@@ -18,7 +18,7 @@
             <tr ng-repeat="u in user | filter:searchText | orderBy: 'name' ">
                 <td contenteditable="false">{{$index + 1}}</td>
                 <td contenteditable="false">{{u.name}}</td>
-                <td contenteditable="false">{{u.student_id}}</td>
+                <td contenteditable="false">{{u.studentId}}</td>
                 <td contenteditable="false">{{u.email}}</td>
                 <td>{{u.isAdmin}}</td>
                 <td><button class="btn" ng-click="historyView(u)">History</button></td>

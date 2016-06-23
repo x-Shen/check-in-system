@@ -6,8 +6,9 @@
         <button type="button" ng-click ="logOut()" class="btn btn-danger">Log Out</button>
     </div>
 </div>
+
 <div data-ng-init="init()">
-    <label>Search: <input ng-model="searchText2"></label>
+  <!-- <label>Search: <input ng-model="searchText2"></label>
     <table class="table table-striped table-hover">
         <thead>
         <tr>
@@ -23,5 +24,21 @@
             <td contenteditable="false">{{    {checkout : u.time[u.time.length - 1].checkout, checkin:  u.time[u.time.length - 1].checkin} | duration }}</td>
         </tr>
         </thead>
+    </table>-->
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>createdAt</th>
+          <th>actionType</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="a in actions">
+          <td>{{a.user.name}}</td>
+          <td>{{a.createdAt}}</td>
+          <td>{{a.actionType}}</td>
+        </tr>
+      </tbody>
     </table>
 </div>

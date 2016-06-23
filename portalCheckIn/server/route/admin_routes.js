@@ -1,8 +1,10 @@
 var express             = require('express'),
     router              = express.Router();
 var mongoose =  require('mongoose');
-var users =     require('../model/usersModel');
+var users =     require('../model/newUserModel');
 var User = mongoose.model('user', users);
+var actions = require('../model/actionModel');
+var Action = mongoose.model('action', actions);
 var path = require('path');
 var config = require('../../config');
 var jwt = require('jsonwebtoken');
@@ -43,18 +45,19 @@ router.use(function(req, res, next) {
 router.post('/login', function(req,res){
     console.log(req.body);
     User.findOne({
-            student_id:req.body.adminID,
+            studentId:req.body.adminID,
             password:req.body.adminPass,
             isAdmin : true
         }
     ,function(err,results){
+            console.log('results ', results);
         if(err){
             console.log("err: "+err);
         }
         if(results){
             //if found go to adminviewpage.html
 
-            var temp_tok = jwt.sign({student_id : req.body.adminID, password : req.body.adminPass}, config.secret, {
+            var temp_tok = jwt.sign({studentId : req.body.adminID, password : req.body.adminPass}, config.secret, {
                 expiresIn: 3600
             });
             token = temp_tok;
@@ -78,7 +81,9 @@ router.post('/login', function(req,res){
 //allow admins to add user
 router.post('/addUser', function(req, res) {
     /* create new user Schema with the req */
+    console.log(req.body);
     var newUser = new User(req.body);
+    console.log(newUser);
     /* Save data from user input into the database */
     newUser.save(function(err) {
         if (err) {
@@ -109,7 +114,7 @@ router.post('/editUser', function(req, res) {
         {
             $set:{
                 "name": req.body.new_name,
-                "student_id": req.body.new_student_id,
+                "studentId": req.body.new_student_id,
                 "email": req.body.new_email,
                 "isAdmin": req.body.promoteAdmin,
                 "password": req.body.new_password
@@ -180,6 +185,20 @@ router.get('/viewUsers', function(req, res) {
     });
 });
 
+//view actions
+router.get('/viewActions', function(req,res){
+    console.log('in action route');
+    Action.find({},function(err,results){
+        if(err){
+            res.send('Unable to view actions. Error: '+err.message);
+        } else {
+            res.status(200);
+            console.log(results);
+            res.json(results);
+        }
+    })
+});
+
 
 //allows admin to delete Users
 router.post('/deleteUsers', function(req, res) {
@@ -198,5 +217,13 @@ router.post('/deleteUsers', function(req, res) {
         }
     })
 });
+
+router.get('/users',function(req, res){
+    User.find({},function(err,result){
+        res.send(result);
+        console.log('inside user route');
+    })
+});
+
 
 module.exports = router;

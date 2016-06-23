@@ -20,7 +20,7 @@ appLogin.controller("loginController", ['$scope','$http', '$state', 'CheckInServ
         //}
         //else{
             $http.post("/users/checkin", {
-                student_id: $scope.checkin
+                studentId: $scope.checkin
             }).success(function(data){
                 // data is json get back from the server
                 if(data.status == 200){
@@ -74,7 +74,7 @@ appLogin.controller("loginController", ['$scope','$http', '$state', 'CheckInServ
         //else{
 
             $http.post("/users/checkout", {
-                student_id: $scope.checkout
+                studentId: $scope.checkout
             }).success(function(data){
                 if(data.status == 200) {
                     //Set name to reflect on confirmation page and go there

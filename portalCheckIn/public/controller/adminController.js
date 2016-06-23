@@ -1,10 +1,10 @@
 //CheckInService.getToken() returns the token stored when the admin has logged in
 
-appLogin.controller("adminController", ['$scope','$http', '$modal', '$state', 'CheckInService',  '$document', function($scope, $http, $modal,$state, CheckInService, $document){
-
+appLogin.controller("adminController", ['$scope','$http', '$modal', '$state', 'CheckInService',  '$document', '$window', function($scope, $http, $modal,$state, CheckInService, $document){
+// placeholder of user
     $scope.user = {
         name: '',
-        student_id: null,
+        studentId: null,
         email: '',
         isAdmin: false,
         password: '',
@@ -22,19 +22,32 @@ appLogin.controller("adminController", ['$scope','$http', '$modal', '$state', 'C
         if(CheckInService.getToken() == undefined) {
             $state.go('adminLogin');
         } else {
-            console.log(CheckInService.getToken());
-            $http.get('/admins/viewUsers?token=' + CheckInService.getToken()).then(function (res) {
-                $scope.userList = res.data;
-                sortDates($scope.userList);
-                convertToDateFormat($scope.userList);
-            }, function (err) {
-                $state.go('adminLogin');
-                if (err) {
-                    console.log(err);
-                } else {
-                }
-            });
+            //get all actions
+            $http.get('/admins/viewActions?token='+CheckInService.getToken()).then(function(res){
+                    $scope.actions = res.data;
+                });
+
+            // //get all the user data from the database
+            // $http.get('/admins/viewUsers?token=' + CheckInService.getToken()).then(function (res) {
+            //     $scope.userList = res.data;
+            //     $scope.user = res.data;
+            //
+            //     //sortDates($scope.userList);
+            //     //convertToDateFormat($scope.userList);
+            //
+            // }, function (err) {
+            //     $state.go('adminLogin');
+            //     if (err) {
+            //         console.log(err);
+            //     } else {
+            //     }
+            // });
         }
+        // $http.get('/admins/viewUsers?token='+CheckInService.getToken()).success(function(data) {
+        //     $scope.user = data;
+        //     console.log(data);
+        // });
+
     };
 
     //Sorts each user by date in descending order (Kevin Pham)
@@ -76,7 +89,11 @@ appLogin.controller("adminController", ['$scope','$http', '$modal', '$state', 'C
             }
         }
     };
-
+    // convert dates for action
+    var convertToDateFormat = function(action){
+        return action.time.toLocaleString();
+    }
+// hash password !
     $scope.openAdd = function () {
 
         $modal.open({
@@ -84,11 +101,13 @@ appLogin.controller("adminController", ['$scope','$http', '$modal', '$state', 'C
             backdrop: true,
             windowClass: 'modal',
             controller: function ($scope, $modalInstance, user, $log, $http) {
+                console.log('user');
+                console.log(user);
                 $scope.user = user;
                 $scope.submit = function () {
                     $http.post('/admins/addUser?token='+CheckInService.getToken(), {
                             name:$scope.user.name,
-                            student_id:$scope.user.student_id,
+                            studentId:$scope.user.studentId,
                             email:$scope.user.email,
                             isAdmin:$scope.user.isAdmin,
                             password:$scope.user.password
@@ -96,7 +115,7 @@ appLogin.controller("adminController", ['$scope','$http', '$modal', '$state', 'C
                     );
                     $modalInstance.dismiss('cancel');
                     user.name = "";
-                    user.student_id = "";
+                    user.studentId = "";
                     user.email = "";
                     user.isAdmin = false;
                     user.password = "";
@@ -104,7 +123,7 @@ appLogin.controller("adminController", ['$scope','$http', '$modal', '$state', 'C
                 $scope.cancel = function () {
                     $modalInstance.dismiss('cancel');
                     user.name = "";
-                    user.student_id = "";
+                    user.studentId = "";
                     user.email = "";
                     user.isAdmin = false;
                     user.password = "";
@@ -119,7 +138,7 @@ appLogin.controller("adminController", ['$scope','$http', '$modal', '$state', 'C
     };
 
     $scope.openView = function () {
-
+        //$window.location.href = '/display_user.html';
         $modal.open({
             templateUrl: 'views/partial-viewUsers.html',
             backdrop: true,
@@ -129,6 +148,7 @@ appLogin.controller("adminController", ['$scope','$http', '$modal', '$state', 'C
                     $scope.user = data;
                     console.log(data);
                 });
+        //$window.location.href='www.google.com';
                 $scope.remove = function (userToDelete) {
                     if(confirm("Are you sure you want to delete "+userToDelete.name+"?")) {
                         $http.post('/admins/deleteUsers?token=' + CheckInService.getToken(), userToDelete).then(
@@ -144,7 +164,7 @@ appLogin.controller("adminController", ['$scope','$http', '$modal', '$state', 'C
                 $scope.edit = function (userToEdit) {
                     //Store userToEdit information so it can be updated on success
                     $scope.user.name = userToEdit.name;
-                    $scope.user.student_id = userToEdit.student_id;
+                    $scope.user.studentId = userToEdit.studentId;
                     $scope.user.email = userToEdit.email;
                     $scope.user.isAdmin = userToEdit.isAdmin;
                     $scope.user.password = userToEdit.password;
@@ -161,7 +181,7 @@ appLogin.controller("adminController", ['$scope','$http', '$modal', '$state', 'C
                                 $http.post('/admins/editUser?token=' + CheckInService.getToken(), {
                                         id: userToEdit._id,
                                         new_name: $scope.user.name,
-                                        new_student_id: $scope.user.student_id,
+                                        new_studentId: $scope.user.studentId,
                                         new_email: $scope.user.email,
                                         promoteAdmin: $scope.user.isAdmin,
                                         new_password: $scope.user.password
@@ -170,7 +190,7 @@ appLogin.controller("adminController", ['$scope','$http', '$modal', '$state', 'C
                                         if(res.status == '200') {
                                             //Reflect changes in database to front-end
                                             userToEdit.name = $scope.user.name;
-                                            userToEdit.student_id = $scope.user.student_id;
+                                            userToEdit.studentId = $scope.user.studentId;
                                             userToEdit.email = $scope.user.email;
                                             userToEdit.isAdmin = $scope.user.isAdmin;
                                             $modalInstance.dismiss('cancel');
@@ -292,28 +312,6 @@ appLogin.controller("adminController", ['$scope','$http', '$modal', '$state', 'C
 
 
                 //return $scope.user;
-            }
-        });
-    };
-
-    $scope.openAlert = function () {
-        $modal.open({
-            templateUrl: '/views/partial-viewAlert.html',
-            backdrop: true,
-            windowClass: 'modal',
-            controller: function ($scope, $modalInstance, $http) {
-                $http.get('/admins/viewUsers').success(function(data) {
-                    $scope.user = data;
-                });
-                $scope.remove = function (userToDelete) {
-                    $http.post('/admins/deleteUsers', userToDelete).then(
-                        $http.get('/admins/viewUsers').success(function(data) {
-                            $scope.user = data;
-                        }));
-                };
-                $scope.cancel = function () {
-                    $modalInstance.dismiss('cancel');
-                }
             }
         });
     };
