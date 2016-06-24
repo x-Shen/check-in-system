@@ -10,10 +10,10 @@ appLogin.filter('duration', function(){
             return hours+' hour(s) '+ mins+' min(s) '+ secs +'sec(s)'
         }
     }
-})
+});
 
 appLogin.filter('currentTime', function(){
     return function(){
         return new Date().toLocaleTimeString()
     }
-})
+});

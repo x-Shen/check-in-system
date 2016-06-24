@@ -11,7 +11,7 @@ var mongoose      = require('mongoose');
 
 
 //connect to mongo
-mongoose.connect('mongodb://db.theportal.io:27017/CheckIn');
+mongoose.connect('mongodb://db.theportal.io:27017/CheckInDev');
 var db = mongoose.connection;
 
 app.use(bodyParser.json());
