@@ -67,6 +67,11 @@ appLogin.config(function($stateProvider, $urlRouterProvider) {
             url: '/CheckOutConfirmation',
             templateUrl : '/views/checkin_confirmation.html'
         })
+        .state('users',{
+            url:'/users',
+            templateUrl: 'views/display_users.html',
+            controller: 'adminController'
+        })
 });
 
 

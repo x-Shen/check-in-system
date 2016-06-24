@@ -36,5 +36,7 @@ router.get('/checkout_confirmation.html', function(req, res) {
 router.get('/admin.html', function(req, res) {
     res.sendfile('./public/views/admin.html');
 });
+ 
+ 
 
 module.exports = router;
