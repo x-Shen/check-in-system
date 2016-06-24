@@ -95,8 +95,6 @@ appLogin.controller("adminController", ['$scope', '$http', '$modal', '$state', '
             backdrop: true,
             windowClass: 'modal',
             controller: function ($scope, $modalInstance, user, $log, $http) {
-                console.log('user');
-                console.log(user);
                 $scope.user = user;
                 $scope.submit = function () {
                     $http.post('/admins/addUser?token=' + CheckInService.getToken(), {
