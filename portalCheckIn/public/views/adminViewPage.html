@@ -29,15 +29,22 @@
       <thead>
         <tr>
           <th>Name</th>
-          <th>createdAt</th>
-          <th>actionType</th>
+          <th>Date</th>
+          <th>Scheduled Check-In</th>
+          <th>Scheduled Check-Out</th>
+          <th>Notes</th>
+          <th>Individual Log History</th>
         </tr>
       </thead>
       <tbody>
         <tr ng-repeat="a in actions">
           <td>{{a.user.name}}</td>
-          <td>{{a.createdAt}}</td>
-          <td>{{a.actionType}}</td>
+          <td>{{formatDate(a.createdAt, 0)}}</td>
+          <td>{{formatDate(a.createdAt, 1)}}</td>
+          <!--<td>{{formatDate(findCheckOut(a, checkout), 1)}}</td>-->
+          <td>Checkout Time</td>
+          <td>Note Section</td>
+          <td>View {{a.actionType}}</td>
         </tr>
       </tbody>
     </table>

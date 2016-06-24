@@ -199,6 +199,31 @@ router.get('/viewActions', function(req,res){
     })
 });
 
+router.get('/viewCheckin', function(req,res){
+    console.log('in checkin route');
+    Action.find({actionType: "checkin"},function(err,results){
+        if(err){
+            res.send('Unable to view actions. Error: '+err.message);
+        } else {
+            res.status(200);
+            console.log(results);
+            res.json(results);
+        }
+    })
+});
+
+router.get('/viewCheckout', function(req,res){
+    console.log('in checkout route');
+    Action.find({actionType: "checkout"},function(err,results){
+        if(err){
+            res.send('Unable to view actions. Error: '+err.message);
+        } else {
+            res.status(200);
+            console.log(results);
+            res.json(results);
+        }
+    })
+});
 
 //allows admin to delete Users
 router.post('/deleteUsers', function(req, res) {

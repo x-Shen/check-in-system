@@ -25,7 +25,19 @@ appLogin.controller("adminController", ['$scope','$http', '$modal', '$state', 'C
             //get all actions
             $http.get('/admins/viewActions?token='+CheckInService.getToken()).then(function(res){
                     $scope.actions = res.data;
-                });
+                    $scope.formatDate = function(date, num){
+                      var time = new Date(date).toLocaleString();
+                      var a = time.split(",");
+                      return a[num];
+                    }
+                  }, function (err) {
+                      $state.go('adminLogin');
+                      if (err) {
+                          console.log(err);
+                      } else {
+                      }
+                  });
+
 
             // //get all the user data from the database
             // $http.get('/admins/viewUsers?token=' + CheckInService.getToken()).then(function (res) {
@@ -49,6 +61,7 @@ appLogin.controller("adminController", ['$scope','$http', '$modal', '$state', 'C
         // });
 
     };
+
 
     //Sorts each user by date in descending order (Kevin Pham)
     var sortDates = function(uList){
