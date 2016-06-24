@@ -1,7 +1,7 @@
 var express             = require('express'),
     router              = express.Router();
 var mongoose =  require('mongoose');
-var users =     require('../model/newUserModel');
+var users =     require('../model/usersModel');
 var User = mongoose.model('user', users);
 var actions = require('../model/actionModel');
 var Action = mongoose.model('action', actions);
@@ -202,34 +202,6 @@ router.get('/viewActions', function(req,res){
     })
 });
 
-<<<<<<< HEAD
-router.get('/viewCheckin', function(req,res){
-    console.log('in checkin route');
-    Action.find({actionType: "checkin"},function(err,results){
-        if(err){
-            res.send('Unable to view actions. Error: '+err.message);
-        } else {
-            res.status(200);
-            console.log(results);
-            res.json(results);
-        }
-    })
-});
-
-router.get('/viewCheckout', function(req,res){
-    console.log('in checkout route');
-    Action.find({actionType: "checkout"},function(err,results){
-        if(err){
-            res.send('Unable to view actions. Error: '+err.message);
-        } else {
-            res.status(200);
-            console.log(results);
-            res.json(results);
-        }
-    })
-});
-=======
->>>>>>> upstream/master
 
 //allows admin to delete Users
 router.post('/deleteUsers', function(req, res) {
@@ -256,9 +228,4 @@ router.get('/users',function(req, res){
     })
 });
 
-
-<<<<<<< HEAD
 module.exports = router;
-=======
-module.exports = router;
->>>>>>> upstream/master
