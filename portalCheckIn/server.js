@@ -11,8 +11,12 @@ var mongoose      = require('mongoose');
 
 
 //connect to mongo
+<<<<<<< HEAD
 //mongoose.connect('mongodb://db.theportal.io:27017/CheckInDev');
 mongoose.connect('mongodb://localhost/CheckTest');
+=======
+mongoose.connect('mongodb://db.theportal.io:27017/CheckInDev');
+>>>>>>> upstream/master
 var db = mongoose.connection;
 
 app.use(bodyParser.json());

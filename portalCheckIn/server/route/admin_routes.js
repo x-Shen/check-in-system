@@ -9,6 +9,9 @@ var path = require('path');
 var config = require('../../config');
 var jwt = require('jsonwebtoken');
 
+var actions = require('../model/actionModel');
+var Action = mongoose.model('action', actions);
+
 
 router.use(function(req, res, next) {
 
@@ -199,6 +202,7 @@ router.get('/viewActions', function(req,res){
     })
 });
 
+<<<<<<< HEAD
 router.get('/viewCheckin', function(req,res){
     console.log('in checkin route');
     Action.find({actionType: "checkin"},function(err,results){
@@ -224,6 +228,8 @@ router.get('/viewCheckout', function(req,res){
         }
     })
 });
+=======
+>>>>>>> upstream/master
 
 //allows admin to delete Users
 router.post('/deleteUsers', function(req, res) {
@@ -251,4 +257,8 @@ router.get('/users',function(req, res){
 });
 
 
+<<<<<<< HEAD
 module.exports = router;
+=======
+module.exports = router;
+>>>>>>> upstream/master

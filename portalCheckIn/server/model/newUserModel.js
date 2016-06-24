@@ -1,4 +1,13 @@
+<<<<<<< HEAD
 var mongoose = require('mongoose');
+=======
+/**
+ * Created by xinshen on 6/21/16.
+ */
+var mongoose = require('mongoose');
+
+
+>>>>>>> upstream/master
 //define schema
 var usersSchema = mongoose.Schema({
     name: String,
@@ -24,9 +33,18 @@ var usersSchema = mongoose.Schema({
     dateActivated:Date,
     dateDeactivated:Date,
     flags: Number
+<<<<<<< HEAD
 
 });
 //passing in collection name, Schema
 var user = mongoose.model("user", usersSchema);
 
 module.exports = user;
+=======
+});
+
+//passing in collection name, Schema
+var user = mongoose.model("user", usersSchema);
+
+module.exports = user;
+>>>>>>> upstream/master

@@ -1,9 +1,10 @@
 <div>
-    <div style="margin-top: 5px;">
+    <div class="nav-bar">
+        <button type="button" class="btn btn-default"><a href="/#/adminView">Admin View</a></button>
         <button type="button" ng-click ="openAdd()" class="btn btn-default">Add</button>
-        <button type="button" ng-click="openAlert()" class="btn btn-warning">Alert</button>
-        <button type="button" ng-click ="openView()" class="btn btn-default">Employee List</button>
+        <button type="button" class="btn btn-default"><a ui-sref="users">Employee List</a></button>
         <button type="button" ng-click ="logOut()" class="btn btn-danger">Log Out</button>
+        <br />
     </div>
 </div>
 
@@ -13,15 +14,14 @@
         <thead>
         <tr>
             <th>Name</th>
-            <th>Last Check-In</th>
-            <th>Last Check-Out</th>
-            <th>Duration</th>
+            <th>Action Type</th>
+            <th>Time</th>
+
         </tr>
-        <tr ng-repeat="u in userList| filter:searchText2 | orderBy: u.time[u.time.length - 1].checkin" ng-if="u.time[u.time.length - 1].checkin != undefined">
-            <td contenteditable="false">{{u.name}}</td>
-            <td contenteditable="false">{{u.time[u.time.length - 1].checkin}}</td>
-            <td contenteditable="false">{{u.time[u.time.length - 1].checkout}}</td>
-            <td contenteditable="false">{{    {checkout : u.time[u.time.length - 1].checkout, checkin:  u.time[u.time.length - 1].checkin} | duration }}</td>
+        <tr ng-repeat="a in actions| filter:searchText2 | orderBy: a.time">
+            <td contenteditable="false">{{a.user.name}}</td>
+            <td contenteditable="false">{{a.actionType}}</td>
+            <td contenteditable="false">{{a.createdAt}}</td>
         </tr>
         </thead>
     </table>-->
@@ -49,3 +49,5 @@
       </tbody>
     </table>
 </div>
+
+
