@@ -1,5 +1,6 @@
 //CheckInService.getToken() returns the token stored when the admin has logged in
 
+
 appLogin.controller("adminController", ['$scope', '$http', '$modal', '$state', 'CheckInService', '$document', '$window', function ($scope, $http, $modal, $state, CheckInService, $document) {
 // placeholder of user
     $scope.user = {

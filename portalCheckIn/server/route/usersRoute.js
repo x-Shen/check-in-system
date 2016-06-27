@@ -8,6 +8,21 @@ var express = require('express'),
 var actions = require('../model/actionModel');
 var Action = mongoose.model('action', actions);
 
+// Google Calendar API setup
+
+var fs = require('fs');
+var readline = require('readline');
+var google = require('googleapis');
+var googleAuth = require('google-auth-library');
+
+// If modifying these scopes, delete your previously saved credentials
+// at ~/.credentials/calendar-nodejs-quickstart.json
+var SCOPES = ['https://www.googleapis.com/auth/calendar.readonly'];
+var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
+    process.env.USERPROFILE) + '/.credentials/';
+var TOKEN_PATH = TOKEN_DIR + 'calendar-nodejs-quickstart.json';
+
+
 moment().format();
 // This function is very messy. Rewrite the logic
 router.post('/checkin', function (req, res) {

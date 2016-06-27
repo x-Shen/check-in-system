@@ -24,7 +24,6 @@ appLogin.controller("loginController", ['$scope','$http', '$state', 'CheckInServ
 
     $scope.loginAdmin = function(){
         $http.post("/admins/login",{
-            //TODO: add hashing
             adminID: $scope.adminID,
             adminPass : $scope.adminPass
         }).success(function(response){
@@ -57,6 +56,5 @@ appLogin.controller("loginController", ['$scope','$http', '$state', 'CheckInServ
                     alert("Student ID does not exist!");
                 }
             });
-        //}
     }
 }]);
