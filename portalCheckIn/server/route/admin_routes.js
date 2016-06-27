@@ -11,6 +11,7 @@ var jwt = require('jsonwebtoken');
 
 var actions = require('../model/actionModel');
 var Action = mongoose.model('action', actions);
+var passwordHash = require('password-hash');
 
 
 router.use(function(req, res, next) {
@@ -46,10 +47,9 @@ router.use(function(req, res, next) {
 
 
 router.post('/login', function(req,res){
-    console.log(req.body);
+
     User.findOne({
             studentId:req.body.adminID,
-            password:req.body.adminPass,
             isAdmin : true
         }
     ,function(err,results){
@@ -59,17 +59,26 @@ router.post('/login', function(req,res){
         }
         if(results){
             //if found go to adminviewpage.html
+            if (passwordHash.verify(req.body.adminPass,results.password)) {
+                var temp_tok = jwt.sign({studentId : req.body.adminID, password : req.body.adminPass}, config.secret, {
+                    expiresIn: 3600
+                });
+                token = temp_tok;
+                res.status(200);
+                res.json({
+                    status : 200,
+                    message : "Found",
+                    token : temp_tok
+                });
 
-            var temp_tok = jwt.sign({studentId : req.body.adminID, password : req.body.adminPass}, config.secret, {
-                expiresIn: 3600
-            });
-            token = temp_tok;
-            res.status(200);
-            res.json({
-                status : 200,
-                message : "Found",
-                token : temp_tok
-            });
+            }
+            else {
+                res.json({
+                    status : 201,
+                    error:"Wrong Password"
+                });
+            }
+
         }else{
             //if not found then give warning, an alert or something
             res.status(201);
@@ -84,9 +93,8 @@ router.post('/login', function(req,res){
 //allow admins to add user
 router.post('/addUser', function(req, res) {
     /* create new user Schema with the req */
-    console.log(req.body);
     var newUser = new User(req.body);
-    console.log(newUser);
+    newUser.password = passwordHash.generate(newUser.password);
     /* Save data from user input into the database */
     newUser.save(function(err) {
         if (err) {
