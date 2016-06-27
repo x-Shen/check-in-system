@@ -31,23 +31,24 @@
           <th>Name</th>
           <th>Date</th>
           <th>Scheduled Check-In</th>
+          <th>Actual Check-In</th>
           <th>Scheduled Check-Out</th>
+          <th>Actual Check-Out</th>
           <th>Notes</th>
           <th>Individual Log History</th>
         </tr>
       </thead>
       <tbody>
-        <tr ng-repeat="a in actions">
+        <tr ng-repeat="a in checkin">
           <td>{{a.user.name}}</td>
           <td>{{formatDate(a.createdAt, 0)}}</td>
+          <td></td>
           <td>{{formatDate(a.createdAt, 1)}}</td>
-          <!--<td>{{formatDate(findCheckOut(a, checkout), 1)}}</td>-->
-          <td>Checkout Time</td>
-          <td>Note Section</td>
-          <td>View {{a.actionType}}</td>
+          <td></td>
+          <td>{{formatDate(a.test, 1)}}</td>
+          <td></td>
+          <td></td>
         </tr>
       </tbody>
     </table>
 </div>
-
-

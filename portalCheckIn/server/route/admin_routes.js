@@ -203,6 +203,33 @@ router.get('/viewActions', function(req,res){
 });
 
 
+router.get('/viewCheckIn', function(req,res){
+  Action.find({actionType: "checkin"}, function(err,results){
+    if (err){
+      throw err;
+    }
+    else{
+      res.status(200);
+      console.log(results);
+      res.json(results);
+    }
+  });
+});
+
+router.get('/viewCheckOut', function(req,res){
+  Action.find({actionType: "checkout"}, function(err,results){
+    if (err){
+      throw err;
+    }
+    else{
+      res.status(200);
+      console.log(results);
+      res.json(results);
+    }
+  });
+});
+
+
 //allows admin to delete Users
 router.post('/deleteUsers', function(req, res) {
     User.findByIdAndRemove(req.body._id, function(err){

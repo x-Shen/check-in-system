@@ -29,6 +29,35 @@ appLogin.controller("adminController", ['$scope', '$http', '$modal', '$state', '
                 $scope.actions = res.data;
             });
 
+            $http.get('/admins/viewCheckIn?token=' + CheckInService.getToken()).then(function (res) {
+                console.log(res.data);
+                $scope.checkin = res.data;
+            });
+
+            $http.get('/admins/viewCheckOut?token=' + CheckInService.getToken()).then(function (res) {
+                console.log(res.data);
+                $scope.checkout = res.data;
+
+                //Giving all the checkin objects a checkout time to display on the adminView
+                for (ci in $scope.checkin){
+                  var time;
+                  var best = null;
+                  for (co in $scope.checkout){
+                    if ($scope.checkin[ci].user.studentId == $scope.checkout[co].user.studentId){
+                      time = new Date($scope.checkout[co].createdAt) - new Date($scope.checkin[ci].createdAt);
+
+                      if (!best && time > 0){
+                        best = time;
+                        $scope.checkin[ci].test = $scope.checkout[co].createdAt;
+                      }else if (best > time && time > 0){
+                        best = time;
+                        $scope.checkin[ci].test = $scope.checkout[co].createdAt;
+                      }
+                    }
+                  }
+                }
+            });
+
             //get all the user data from the database
 
             // $http.get('/admins/viewUsers?token=' + CheckInService.getToken()).then(function (res) {
@@ -69,6 +98,21 @@ appLogin.controller("adminController", ['$scope', '$http', '$modal', '$state', '
 
     };
 
+    $scope.formatDate = function(date, place){
+      var a = new Date(date).toLocaleString().split(',');
+      return a[place];
+    }
+
+
+
+    $scope.findCheckOut = function(user, checkin){
+      var listcheckout = $scope.checkout;
+      for (co in listcheckout){
+        if (user.name == listcheckout[co].name){
+          return $scope.formatDate(listcheckout[co].createdAt, 1);
+        }
+      }
+    }
 
     //Sorts each user by date in descending order (Kevin Pham)
     var sortDates = function (uList) {
