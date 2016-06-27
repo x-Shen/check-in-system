@@ -48,7 +48,8 @@ appLogin.controller("adminController", ['$scope', '$http', '$modal', '$state', '
                           if (!best && time > 0){
                             best = time;
                             $scope.checkin[ci].checkout = $scope.checkout[co].createdAt;
-                          }else if (best > time && time > 0){
+                          }
+                          else if (best > time && time > 0){
                             best = time;
                             $scope.checkin[ci].checkout = $scope.checkout[co].createdAt;
                           }
