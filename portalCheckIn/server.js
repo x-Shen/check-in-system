@@ -12,7 +12,7 @@ var mongoose      = require('mongoose');
 
 //connect to mongo
 
-mongoose.connect('mongodb://db.theportal.io:27017/CheckInDev');
+mongoose.connect('mongodb://localhost/CheckTest');
 
 var db = mongoose.connection;
 
