@@ -11,7 +11,10 @@ var mongoose      = require('mongoose');
 
 
 //connect to mongo
+
+//mongoose.connect('mongodb://localhost/CheckTest');
 mongoose.connect('mongodb://db.theportal.io:27017/CheckInDev');
+
 var db = mongoose.connection;
 
 app.use(bodyParser.json());
@@ -23,7 +26,7 @@ app.use('/admins',          admins);
 app.use('/users',           users);
 app.use('/',                index);
 
-app.set('port', process.env.PORT || 8080);
+app.set('port', process.env.PORT || 3000);
 
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function(callback){

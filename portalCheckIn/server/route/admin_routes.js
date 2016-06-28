@@ -3,6 +3,8 @@ var express             = require('express'),
 var mongoose =  require('mongoose');
 var users =     require('../model/usersModel');
 var User = mongoose.model('user', users);
+var actions = require('../model/actionModel');
+var Action = mongoose.model('action', actions);
 var path = require('path');
 var config = require('../../config');
 var jwt = require('jsonwebtoken');
@@ -209,6 +211,33 @@ router.get('/viewActions', function(req,res){
 });
 
 
+router.get('/viewCheckIn', function(req,res){
+  Action.find({actionType: "checkin"}, function(err,results){
+    if (err){
+      throw err;
+    }
+    else{
+      res.status(200);
+      console.log(results);
+      res.json(results);
+    }
+  });
+});
+
+router.get('/viewCheckOut', function(req,res){
+  Action.find({actionType: "checkout"}, function(err,results){
+    if (err){
+      throw err;
+    }
+    else{
+      res.status(200);
+      console.log(results);
+      res.json(results);
+    }
+  });
+});
+
+
 //allows admin to delete Users
 router.post('/deleteUsers', function(req, res) {
     User.findByIdAndRemove(req.body._id, function(err){
@@ -233,6 +262,5 @@ router.get('/users',function(req, res){
         console.log('inside user route');
     })
 });
-
 
 module.exports = router;

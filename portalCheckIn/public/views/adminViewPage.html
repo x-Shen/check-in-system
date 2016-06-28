@@ -1,5 +1,5 @@
-<div>
-    <div class="nav-bar">
+<div class="navbar navbar-default navbar-static-top">
+    <div class="container-fluid">
         <button type="button" class="btn btn-default"><a href="/#/adminView">Admin View</a></button>
         <button type="button" ng-click ="openAdd()" class="btn btn-default">Add</button>
         <button type="button" class="btn btn-default"><a ui-sref="users">Employee List</a></button>
@@ -7,8 +7,9 @@
         <br />
     </div>
 </div>
+
 <div data-ng-init="init()">
-    <label>Search: <input ng-model="searchText2"></label>
+  <!-- <label>Search: <input ng-model="searchText2"></label>
     <table class="table table-striped table-hover">
         <thead>
         <tr>
@@ -23,7 +24,31 @@
             <td contenteditable="false">{{a.createdAt}}</td>
         </tr>
         </thead>
+    </table>-->
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Date</th>
+          <th>Scheduled Check-In</th>
+          <th>Actual Check-In</th>
+          <th>Scheduled Check-Out</th>
+          <th>Actual Check-Out</th>
+          <th class="notes">Notes</th>
+          <th>Individual Log History</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="a in checkin">
+          <td>{{a.user.name}}</td>
+          <td>{{formatDate(a.createdAt, 0)}}</td>
+          <td></td>
+          <td>{{formatDate(a.createdAt, 1)}}</td>
+          <td></td>
+          <td>{{formatDate(a.checkout, 1)}}</td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tbody>
     </table>
 </div>
-
-

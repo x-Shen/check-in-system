@@ -2,6 +2,7 @@
 
 
 appLogin.controller("adminController", ['$scope', '$http', '$modal', '$state', 'CheckInService', '$document', '$window', function ($scope, $http, $modal, $state, CheckInService, $document) {
+
 // placeholder of user
     $scope.user = {
         name: '',
@@ -24,17 +25,51 @@ appLogin.controller("adminController", ['$scope', '$http', '$modal', '$state', '
             $state.go('adminLogin');
         } else {
             //get all actions
+
             $http.get('/admins/viewActions?token=' + CheckInService.getToken()).then(function (res) {
                 $scope.actions = res.data;
             });
 
+            $http.get('/admins/viewCheckIn?token=' + CheckInService.getToken()).then(function (res) {
+                console.log(res.data);
+                $scope.checkin = res.data;
+                $http.get('/admins/viewCheckOut?token=' + CheckInService.getToken()).then(function (res) {
+                    console.log(res.data);
+                    $scope.checkout = res.data;
+
+                    //Giving all the checkin objects a checkout time to display on the adminView
+                    for (ci in $scope.checkin){
+                      var time;
+                      var best = null;
+                      for (co in $scope.checkout){
+                        if ($scope.checkin[ci].user.studentId == $scope.checkout[co].user.studentId){
+                          time = new Date($scope.checkout[co].createdAt) - new Date($scope.checkin[ci].createdAt);
+
+                          if (!best && time > 0){
+                            best = time;
+                            $scope.checkin[ci].checkout = $scope.checkout[co].createdAt;
+                          }
+                          else if (best > time && time > 0){
+                            best = time;
+                            $scope.checkin[ci].checkout = $scope.checkout[co].createdAt;
+                          }
+                        }
+                      }
+                    }
+                });
+            });
+
+
             //get all the user data from the database
+
             // $http.get('/admins/viewUsers?token=' + CheckInService.getToken()).then(function (res) {
             //     $scope.userList = res.data;
             //     $scope.user = res.data;
             //
+
             //     // sortDates($scope.userList);
             //     // convertToDateFormat($scope.userList);
+
             // }, function (err) {
             //     $state.go('adminLogin');
             //     if (err) {
@@ -43,6 +78,7 @@ appLogin.controller("adminController", ['$scope', '$http', '$modal', '$state', '
             //     }
             // });
         }
+
 
 
     };
@@ -61,7 +97,24 @@ appLogin.controller("adminController", ['$scope', '$http', '$modal', '$state', '
             } else {
             }
         });
+
     };
+
+    $scope.formatDate = function(date, place){
+      var a = new Date(date).toLocaleString().split(',');
+      return a[place];
+    }
+
+
+
+    $scope.findCheckOut = function(user, checkin){
+      var listcheckout = $scope.checkout;
+      for (co in listcheckout){
+        if (user.name == listcheckout[co].name){
+          return $scope.formatDate(listcheckout[co].createdAt, 1);
+        }
+      }
+    }
 
     //Sorts each user by date in descending order (Kevin Pham)
     var sortDates = function (uList) {
@@ -88,6 +141,7 @@ appLogin.controller("adminController", ['$scope', '$http', '$modal', '$state', '
     };
 
 
+
 // hash password !
     $scope.openAdd = function () {
 
@@ -96,6 +150,8 @@ appLogin.controller("adminController", ['$scope', '$http', '$modal', '$state', '
             backdrop: true,
             windowClass: 'modal',
             controller: function ($scope, $modalInstance, user, $log, $http) {
+                console.log('user');
+                console.log(user);
                 $scope.user = user;
                 $scope.submit = function () {
                     $http.post('/admins/addUser?token=' + CheckInService.getToken(), {
@@ -131,6 +187,7 @@ appLogin.controller("adminController", ['$scope', '$http', '$modal', '$state', '
     };
 
 
+
     $scope.remove = function (userToDelete) {
         if (confirm("Are you sure you want to delete " + userToDelete.name + "?")) {
             $http.post('/admins/deleteUsers?token=' + CheckInService.getToken(), userToDelete).then(
@@ -150,6 +207,7 @@ appLogin.controller("adminController", ['$scope', '$http', '$modal', '$state', '
         $scope.user.email = userToEdit.email;
         $scope.user.isAdmin = userToEdit.isAdmin;
         $scope.user.password = userToEdit.password;
+
         $modal.open({
             templateUrl: 'views/partial-editUser.html',
             backdrop: true,
@@ -209,12 +267,14 @@ appLogin.controller("adminController", ['$scope', '$http', '$modal', '$state', '
             backdrop: true,
             windowClass: 'modal viewUserModal lower',
             controller: function ($scope, $modalInstance, $http) {
+
                 $scope.userData = userIndex;
 
                 //Convert times to be more human readable. Modified from above.
                 for (var i = 0; i < $scope.userData.time.length; i++) {
                     if ($scope.userData.time[i].checkin != null) {
                         $scope.userData.time[i].checkin = new Date($scope.userData.time[i].checkin).toLocaleString();
+
                     }
                     if ($scope.userData.time[i].checkout != null) {
                         $scope.userData.time[i].checkout = new Date($scope.userData.time[i].checkout).toLocaleString();
@@ -232,6 +292,7 @@ appLogin.controller("adminController", ['$scope', '$http', '$modal', '$state', '
 
                     // Pass to front-end partial-editTimeInHistory.html
                     $scope.selectedIndex = index;
+
 
 
                     $modal.open({
@@ -258,6 +319,7 @@ appLogin.controller("adminController", ['$scope', '$http', '$modal', '$state', '
                                             // instant update to front page
                                             timeHistoryByIndex.checkin = $scope.userTime.checkin;
                                             timeHistoryByIndex.checkout = $scope.userTime.checkout;
+
                                             $modalInstance.dismiss('cancel');
                                         }
                                         else if (res.error.code == 11000)
@@ -290,8 +352,6 @@ appLogin.controller("adminController", ['$scope', '$http', '$modal', '$state', '
             }
         });
     };
-
-
     $scope.logOut = function () {
         $state.go('adminLogin');
         CheckInService.removeToken();

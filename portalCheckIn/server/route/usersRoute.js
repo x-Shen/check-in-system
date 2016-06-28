@@ -70,8 +70,8 @@ router.post('/checkin', function (req, res) {
 });
 
 router.post('/checkout' ,function(req,res){
-    var now = moment();
-    var nowDate = now.local().toDate();
+   var now = moment();
+   var nowDate = now.local().toDate();
 
     User.findOne(req.body, function (err, result) {
         console.log(result);
