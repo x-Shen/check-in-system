@@ -198,13 +198,13 @@ router.get('/viewUsers', function(req, res) {
 
 //view actions
 router.get('/viewActions', function(req,res){
-    console.log('in action route');
+
     Action.find({},function(err,results){
         if(err){
             res.send('Unable to view actions. Error: '+err.message);
         } else {
             res.status(200);
-            console.log(results);
+
             res.json(results);
         }
     })
@@ -218,7 +218,7 @@ router.get('/viewCheckIn', function(req,res){
     }
     else{
       res.status(200);
-      console.log(results);
+
       res.json(results);
     }
   });
@@ -231,7 +231,7 @@ router.get('/viewCheckOut', function(req,res){
     }
     else{
       res.status(200);
-      console.log(results);
+
       res.json(results);
     }
   });
