@@ -30,7 +30,7 @@ var TOKEN_PATH = TOKEN_DIR + 'calendar-nodejs-quickstart.json';
 var CronJob = require('cron').CronJob;
 
 var job = new CronJob({
-    cronTime: '00 00 07 * * 1-5',
+    cronTime: '00 50 13 * * 1-5',
     onTick: function() {
         // Load client secrets from a local file.
         fs.readFile('client_secret.json', function processClientSecrets(err, content) {
@@ -159,6 +159,7 @@ function listEvents(auth) {
                 schedule.start = event.start.dateTime;
                 schedule.end = event.end.dateTime;
                 schedule.user.name = event.summary;
+                schedule.user.studentId = event.description;
                 schedule.save();
                 console.log('%s - %s', start, event.summary);
             }
