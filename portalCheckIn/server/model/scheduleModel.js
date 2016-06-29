@@ -11,7 +11,8 @@ scheduleSchema = mongoose.Schema({
         name:String
     }
 
-});
+
+},{ capped: 1024 });
 
 
 var schedule = mongoose.model("schedule", scheduleSchema);

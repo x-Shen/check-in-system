@@ -185,36 +185,45 @@ router.post('/checkin', function (req, res) {
         }
         else {
             var newAction = new Action();
-            newAction.actionType = 'checkin';
+            newAction.type[0] = 'checkin';
             newAction.user = {studentId: result.studentId, name: result.name};
             newAction.createdAt = nowDate;
             var userid = result.studentId;
-            Action.count({actionType: 'checkin',"user.studentId": userid}, function (err, checkincount) {
-                Action.count({actionType: 'checkout',"user.studentId": userid}, function (err, checkoutcount) {
+            Action.count({type: 'checkin',"user.studentId": userid}, function (err, checkincount) {
+                Action.count({type: 'checkout',"user.studentId": userid}, function (err, checkoutcount) {
                     if (checkincount == checkoutcount) {
                         //if the user is not checked in, check the user in
-                        Schedule.find({user:{name: newAction.user.name}
+                        Schedule.find({user:{name: newAction.user.name},
                         },function(err, shifts){
 
-                            console.log('shifts ', shifts);
+                            //console.log('shifts ', shifts);
                             if (shifts.length>0){
-
                                 var current_time = newAction.createdAt.getTime();
                                 var shift_start = shifts[0].start.getTime();
-                                if(current_time-shift_start>360){
-                                    console.log('late check in');
-                                    //add a late tag when actionModel is fixed
+
+                                for(i=0; i<shifts.length; i++){
+
+                                    if(shifts[i].start.getDate() == newAction.createdAt.getDate()){
+                                        if(current_time-shift_start>360){
+                                            console.log('late check in');
+                                            //add a late tag when actionModel is fixed
+                                            newAction.type[1] = 'late';
+                                        }
+                                        else{
+                                            console.log('regular check in');
+                                        }
+                                        newAction.save();
+                                        break;
+                                    }
                                 }
-                                else{
-                                    console.log('regular check in')
-                                }
+
                             }
                             else{
                                 console.log("Can't check in, no shift today");
                             }
                         });
                         // put this inside previous if
-                        newAction.save();
+
 
                         res.status(200);
                         res.json({
@@ -258,8 +267,8 @@ router.post('/checkout' ,function(req,res){
         else if (result){ //found a user
             //Compare checkin and checkout counts to see whether or not to checkout
             //If the number of checkin is the same than the number of checkout for a user, then the person did not checkin yet.
-            Action.count({actionType: "checkout", "user.name": result.name}, function(err, checkoutcount){
-                Action.count({actionType: "checkin", "user.name": result.name}, function(err, checkincount){
+            Action.count({type: "checkout", "user.name": result.name}, function(err, checkoutcount){
+                Action.count({type: "checkin", "user.name": result.name}, function(err, checkincount){
                     console.log(result.name + " Checkout: " + checkoutcount + " Checkin: " + checkincount);
                     if (err){
                         throw err;
@@ -268,7 +277,7 @@ router.post('/checkout' ,function(req,res){
                         //do checkout and compare calendar here
                         //make the checkout object
                         var newAction = new Action({
-                            actionType: "checkout",
+                            type: "checkout",
                             createdAt: nowDate,
                             user: {studentId: result.studentId, name: result.name}
                         });
