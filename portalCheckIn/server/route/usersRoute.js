@@ -203,7 +203,7 @@ router.post('/checkin', function (req, res) {
                                 for(i=0; i<shifts.length; i++){
                                     var current_time = newAction.createdAt.getTime();
                                     var shift_start = shifts[i].start.getTime();
-                                    if(shifts[i].start.getDate() == newAction.createdAt.getDate() && -360 < current_time-shift_start <= 10080){{
+                                    if(shifts[i].start.getDate() == newAction.createdAt.getDate() && -360 < current_time-shift_start <= shifts[i].end.getTime()-300){{
                                         if(current_time-shift_start > 360){
                                             console.log('late check in');
                                             //add a late tag when actionModel is fixed
