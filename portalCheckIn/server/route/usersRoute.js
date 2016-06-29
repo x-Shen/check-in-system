@@ -198,13 +198,12 @@ router.post('/checkin', function (req, res) {
 
                             //console.log('shifts ', shifts);
                             if (shifts.length>0){
-                                var current_time = newAction.createdAt.getTime();
-                                var shift_start = shifts[0].start.getTime();
 
                                 for(i=0; i<shifts.length; i++){
-
-                                    if(shifts[i].start.getDate() == newAction.createdAt.getDate()){
-                                        if(current_time-shift_start>360){
+                                    var current_time = newAction.createdAt.getTime();
+                                    var shift_start = shifts[i].start.getTime();
+                                    if(shifts[i].start.getDate() == newAction.createdAt.getDate() && -360 < current_time-shift_start <= 10080){{
+                                        if(current_time-shift_start > 360){
                                             console.log('late check in');
                                             //add a late tag when actionModel is fixed
                                             newAction.type[1] = 'late';
@@ -214,6 +213,7 @@ router.post('/checkin', function (req, res) {
                                         }
                                         newAction.save();
                                         break;
+                                    }
                                     }
                                 }
 
