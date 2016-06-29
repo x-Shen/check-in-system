@@ -130,11 +130,15 @@ function storeToken(token) {
  */
 function listEvents(auth) {
     var calendar = google.calendar('v3');
+    var next_day = new Date();
+    next_day.setDate(next_day.getDate()+1);
+    console.log(next_day);
     calendar.events.list({
         auth: auth,
         calendarId: '1t8dl0sqarrudmiqutl36er5bo@group.calendar.google.com',
         timeMin: (new Date()).toISOString(),
-        maxResults: 10,
+        timeMax: next_day.toISOString(),
+        maxResults: 50,
         singleEvents: true,
         orderBy: 'startTime'
     }, function(err, response) {
@@ -146,7 +150,7 @@ function listEvents(auth) {
         if (events.length == 0) {
             console.log('No upcoming events found.');
         } else {
-            console.log('Upcoming 10 events:');
+            console.log('Upcoming events of the day:');
             for (var i = 0; i < events.length; i++) {
                 var event = events[i];
                 var start = event.start.dateTime || event.start.date;
@@ -189,6 +193,27 @@ router.post('/checkin', function (req, res) {
                 Action.count({actionType: 'checkout',"user.studentId": userid}, function (err, checkoutcount) {
                     if (checkincount == checkoutcount) {
                         //if the user is not checked in, check the user in
+                        Schedule.find({user:{name: newAction.user.name}
+                        },function(err, shifts){
+
+                            console.log('shifts ', shifts);
+                            if (shifts.length>0){
+
+                                var current_time = newAction.createdAt.getTime();
+                                var shift_start = shifts[0].start.getTime();
+                                if(current_time-shift_start>360){
+                                    console.log('late check in');
+                                    //add a late tag when actionModel is fixed
+                                }
+                                else{
+                                    console.log('regular check in')
+                                }
+                            }
+                            else{
+                                console.log("Can't check in, no shift today");
+                            }
+                        });
+                        // put this inside previous if
                         newAction.save();
 
                         res.status(200);
