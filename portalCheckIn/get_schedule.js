@@ -1,7 +1,7 @@
 /**
  * Created by xinshen on 6/29/16.
  */
-var User = require('../model/usersModel');
+var User = require('./server/model/usersModel');
 // Google Calendar API setup
 
 var fs = require('fs');
@@ -21,7 +21,7 @@ var TOKEN_PATH = TOKEN_DIR + 'calendar-nodejs-quickstart.json';
 var CronJob = require('cron').CronJob;
 
 var job = new CronJob({
-    cronTime: '00 50 13 * * 1-5',
+    cronTime: '00 41 10 * * 1-5',
     onTick: function() {
         // Load client secrets from a local file.
         fs.readFile('client_secret.json', function processClientSecrets(err, content) {
