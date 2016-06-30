@@ -23,13 +23,13 @@ router.post('/checkin', function (req, res) {
         }
         else {
             var newAction = new Action();
-            newAction.type.push = 'checkin';
+            newAction.type.push('checkin');
             newAction.user = {studentId: result.studentId, name: result.name};
             newAction.createdAt = nowDate;
             var userid = result.studentId;
             Action.find({'user._id': newAction.user._id}, {}, {sort: {'createdAt': -1}}, function (actions, err) {
                 
-                if (actions[0].type[0] =='checkout'){
+                if (actions[0].includes('checkout')){
                     Schedule.find({'user._id': newAction.user._id}, function (err, shifts) {
                         if (shifts.length === 1) {
                             var shift = shifts[0];

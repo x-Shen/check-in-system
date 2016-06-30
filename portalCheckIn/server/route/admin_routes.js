@@ -94,7 +94,9 @@ router.post('/login', function(req,res){
 router.post('/addUser', function(req, res) {
     /* create new user Schema with the req */
     var newUser = new User(req.body);
-    newUser.password = passwordHash.generate(newUser.password);
+    if (newUser.is_Admin == true){
+        newUser.password = passwordHash.generate(newUser.password);
+    }
     /* Save data from user input into the database */
     newUser.save(function(err) {
         if (err) {
