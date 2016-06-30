@@ -7,11 +7,9 @@ scheduleSchema = mongoose.Schema({
     start: Date,
     end: Date,
     user: {
-        studentId:Number,
+        _id:Number,
         name:String
     }
-
-
 },{ capped: 1024 });
 
 
