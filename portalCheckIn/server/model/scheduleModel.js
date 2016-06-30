@@ -7,7 +7,7 @@ scheduleSchema = mongoose.Schema({
     start: Date,
     end: Date,
     user: {
-        _id:Number,
+        _id: mongoose.Schema.Types.ObjectId,
         name:String
     }
 },{ capped: 1024 });

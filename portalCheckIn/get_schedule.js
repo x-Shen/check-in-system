@@ -21,8 +21,8 @@ var TOKEN_PATH = TOKEN_DIR + 'calendar-nodejs-quickstart.json';
 var CronJob = require('cron').CronJob;
 
 var job = new CronJob({
-    cronTime: '00 13 11 * * 1-5',
-    onTick: function() {
+    cronTime: '00 14 15 * * 1-5',
+    onTick: function () {
         // Load client secrets from a local file.
         fs.readFile('client_secret.json', function processClientSecrets(err, content) {
             if (err) {
@@ -55,7 +55,7 @@ function authorize(credentials, callback) {
     var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
 
     // Check if we have previously stored a token.
-    fs.readFile(TOKEN_PATH, function(err, token) {
+    fs.readFile(TOKEN_PATH, function (err, token) {
         if (err) {
             getNewToken(oauth2Client, callback);
         } else {
@@ -83,9 +83,9 @@ function getNewToken(oauth2Client, callback) {
         input: process.stdin,
         output: process.stdout
     });
-    rl.question('Enter the code from that page here: ', function(code) {
+    rl.question('Enter the code from that page here: ', function (code) {
         rl.close();
-        oauth2Client.getToken(code, function(err, token) {
+        oauth2Client.getToken(code, function (err, token) {
             if (err) {
                 console.log('Error while trying to retrieve access token', err);
                 return;
@@ -122,7 +122,7 @@ function storeToken(token) {
 function listEvents(auth) {
     var calendar = google.calendar('v3');
     var next_day = new Date();
-    next_day.setDate(next_day.getDate()+1);
+    next_day.setDate(next_day.getDate() + 1);
     console.log(next_day);
     calendar.events.list({
         auth: auth,
@@ -132,7 +132,7 @@ function listEvents(auth) {
         maxResults: 50,
         singleEvents: true,
         orderBy: 'startTime'
-    }, function(err, response) {
+    }, function (err, response) {
         if (err) {
             console.log('The API returned an error: ' + err);
             return;
@@ -142,23 +142,34 @@ function listEvents(auth) {
             console.log('No upcoming events found.');
         } else {
             console.log('Upcoming events of the day:');
-            for (var i = 0; i < events.length; i++) {
-                var event = events[i];
-                var start = event.start.dateTime || event.start.date;
-                //add event as schedule objects
-                var schedule = new Schedule();
-                schedule.start = event.start.dateTime;
-                schedule.end = event.end.dateTime;
-                schedule.user.name = event.summary;
-                User.findOne({name:event.summary, studentId:event.description},function(err,result){
-                    console.log(result);
-                    if (result != null){
+
+            var make_schedule = function (event) {
+                User.findOne({name: event.summary, studentId: event.description}, function (err, result) {
+                    if (result != null) {
+                        var schedule = new Schedule({
+                            start: event.start.dateTime,
+                            end: event.end.dateTime,
+                            user: {
+                                name: event.summary,
+                                _id: result._id
+                            }
+                        });
+                        schedule.start = event.start.dateTime;
+                        schedule.end = event.end.dateTime;
+                        schedule.user.name = event.summary;
+                        console.log('inside if');
                         schedule.user._id = result._id;
+                        schedule.save();
+                        console.log('saved');
+
                     }
                 });
-                schedule.save();
-                console.log('%s - %s', start, event.summary);
+            };
+            for (var i = 0; i < events.length; i++) {
+                make_schedule(events[i]);
             }
+
+
         }
     });
 }

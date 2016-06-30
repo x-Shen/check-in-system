@@ -15,6 +15,7 @@ router.post('/checkin', function (req, res) {
 
     User.findOne(req.body, function (err, result) {
         //if user id does not exist, send an alert.
+        console.log(result);
         if (result == null) {
             res.status(202);
             res.json({
@@ -24,15 +25,25 @@ router.post('/checkin', function (req, res) {
         else {
             var newAction = new Action();
             newAction.type.push('checkin');
-            newAction.user = {studentId: result.studentId, name: result.name};
+            newAction.user = {_id: result._id, name: result.name};
             newAction.createdAt = nowDate;
-            var userid = result.studentId;
-            Action.findOne({'user._id': newAction.user._id}, {}, {sort: {'createdAt': -1}}, function (actions, err) {
-                if (actions.type.includes('checkout')){
+            console.log(newAction);
+            Action.find({},function(err, actions){
+                console.log(actions);
+                console.log("Found!!!!!!!!!!!!!!!!!!!");
+            });
+            Action.find({'user._id': result._id}, {}, {sort: {'createdAt': -1}}, function (err, actions) {
+                console.log('actions');
+                console.log(actions);
+                if (actions == null) {
                     Schedule.find({'user._id': newAction.user._id}, function (err, shifts) {
+                        console.log(shifts);
                         if (shifts.length === 1) {
+                            console.log('in first if');
                             var shift = shifts[0];
-                            if (now.getTime() - shift.end.getTime() <= bufferTime) {
+                            console.log(nowDate.getTime() - shift.end.getTime());
+                            if (shift.end.getTime() - nowDate.getTime() <= bufferTime) {
+                                console.log('stop check in');
                                 // STOP CHECKIN
                                 res.status(201);
                                 res.json({
@@ -40,7 +51,42 @@ router.post('/checkin', function (req, res) {
                                     err : "You shift is about to end"
                                 })
                             }
-                            else if(now.getTime - shift.start.getTime() <= bufferTime){
+                            else if(nowDate.getTime - shift.start.getTime() <= bufferTime){
+                                console.log('check in');
+                                newAction.save();
+                                res.status(200);
+                                res.json({
+                                    status : 200,
+                                    message : "User Checked In"
+
+                                })
+                            }
+                            else {
+                                console.log('late checkin');
+                                newAction.type.push('late');
+                                newAction.save();
+                                res.status(200);
+                                res.json({
+                                    status: 200,
+                                    message : "User Checed in Late"
+                                })
+                            }
+                        }
+                    })
+                }
+                else if (actions[0].type[0]==='checkout'){
+                    Schedule.find({'user._id': newAction.user._id}, function (err, shifts) {
+                        if (shifts.length === 1) {
+                            var shift = shifts[0];
+                            if (nowDate.getTime() - shift.end.getTime() <= bufferTime) {
+                                // STOP CHECKIN
+                                res.status(201);
+                                res.json({
+                                    status : 201,
+                                    err : "You shift is about to end"
+                                })
+                            }
+                            else if(nowDate.getTime - shift.start.getTime() <= bufferTime){
                                 newAction.save();
                                 res.status(200);
                                 res.json({
@@ -55,7 +101,7 @@ router.post('/checkin', function (req, res) {
                                 res.status(200);
                                 res.json({
                                     status: 200,
-                                    message : "User Checed in Late"
+                                    message : "User Checked in Late"
                                 })
                             }
                         }

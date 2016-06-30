@@ -16,7 +16,7 @@ actionSchema = mongoose.Schema({
     type: [String],
     //whether we need id?
     user: {
-        _id:Number,
+        _id: mongoose.Schema.Types.ObjectId,
         name:String
     },
 
