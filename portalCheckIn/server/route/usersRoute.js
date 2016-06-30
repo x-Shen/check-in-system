@@ -27,9 +27,8 @@ router.post('/checkin', function (req, res) {
             newAction.user = {studentId: result.studentId, name: result.name};
             newAction.createdAt = nowDate;
             var userid = result.studentId;
-            Action.find({'user._id': newAction.user._id}, {}, {sort: {'createdAt': -1}}, function (actions, err) {
-                
-                if (actions[0].includes('checkout')){
+            Action.findOne({'user._id': newAction.user._id}, {}, {sort: {'createdAt': -1}}, function (actions, err) {
+                if (actions.type.includes('checkout')){
                     Schedule.find({'user._id': newAction.user._id}, function (err, shifts) {
                         if (shifts.length === 1) {
                             var shift = shifts[0];
