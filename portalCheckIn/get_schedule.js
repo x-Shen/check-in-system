@@ -150,7 +150,7 @@ function listEvents(auth) {
                 schedule.start = event.start.dateTime;
                 schedule.end = event.end.dateTime;
                 schedule.user.name = event.summary;
-                User.find({name:event.summary, studentId:event.description},function(err,result){
+                User.findOne({name:event.summary, studentId:event.description},function(err,result){
                     console.log(result);
                     if (result != null){
                         schedule.user._id = result._id;
