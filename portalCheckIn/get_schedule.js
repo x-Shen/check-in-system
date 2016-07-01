@@ -163,8 +163,7 @@ function listEvents(auth) {
                 });
             };
             for (var i = 0; i < events.length; i++) {
-                // console.log('event');
-                // console.log(events[1]);
+
                 make_schedule(events[i]);
             }
 

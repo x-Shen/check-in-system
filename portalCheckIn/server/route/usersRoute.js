@@ -31,10 +31,10 @@ router.post('/checkin', function (req, res) {
             var tomorrow = moment(today).add(1, 'days');
 
             Action.findOne({'user._id': result._id}, {}, {sort: {'createdAt': -1}}, function (err, actions) {
-
+                //console.log(actions);
                 var match_schedule = function (newAction, nowDate) {
                     Schedule.find({'user._id': newAction.user._id, start: {"$gte": today.toDate(), "$lt": tomorrow.toDate()}}, {}, {sort:{'start': -1}}, function (err, shifts) {
-
+                        //console.log(shifts);
                         if (shifts.length === 1) {
 
                             var shift = shifts[0];
@@ -76,7 +76,7 @@ router.post('/checkin', function (req, res) {
                 if (actions == null) {
                     match_schedule(newAction,nowDate);
                 }
-                else if (actions.type.indexOf('checkout') != -1) {
+                else if (actions.type.indexOf('checkin') == -1) {
 
                         match_schedule(newAction,nowDate);
 
