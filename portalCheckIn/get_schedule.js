@@ -21,7 +21,7 @@ var TOKEN_PATH = TOKEN_DIR + 'calendar-nodejs-quickstart.json';
 var CronJob = require('cron').CronJob;
 
 var job = new CronJob({
-    cronTime: '00 14 15 * * 1-5',
+    cronTime: '00 38 10 * * 1-5',
     onTick: function () {
         // Load client secrets from a local file.
         fs.readFile('client_secret.json', function processClientSecrets(err, content) {
@@ -144,7 +144,7 @@ function listEvents(auth) {
             console.log('Upcoming events of the day:');
 
             var make_schedule = function (event) {
-                User.findOne({name: event.summary, studentId: event.description}, function (err, result) {
+                User.findOne({name: event.summary}, function (err, result) {
                     if (result != null) {
                         var schedule = new Schedule({
                             start: event.start.dateTime,
@@ -154,18 +154,17 @@ function listEvents(auth) {
                                 _id: result._id
                             }
                         });
-                        schedule.start = event.start.dateTime;
-                        schedule.end = event.end.dateTime;
-                        schedule.user.name = event.summary;
-                        console.log('inside if');
-                        schedule.user._id = result._id;
+
+                        console.log(schedule.user.name);
+
                         schedule.save();
-                        console.log('saved');
 
                     }
                 });
             };
             for (var i = 0; i < events.length; i++) {
+                // console.log('event');
+                // console.log(events[1]);
                 make_schedule(events[i]);
             }
 
