@@ -2,4 +2,4 @@ portalCheckIn/node_modules/
 portalCheckIn/.idea/
 .idea/
 npm-debug.log
-client_secret
+client_secret.json
