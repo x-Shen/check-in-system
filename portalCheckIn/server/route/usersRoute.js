@@ -7,7 +7,7 @@ Action = require('../model/actionModel');
 Schedule = require('../model/scheduleModel');
 
 router.post('/checkin', function (req, res) {
-    
+
     var bufferTime = 6 * 60 * 1000; //6 minutes in milliseconds
 
     User.findOne(req.body, function (err, result) {
@@ -26,66 +26,88 @@ router.post('/checkin', function (req, res) {
             //newAction.createdAt = nowDate;
             var today = moment().startOf('day');
             var tomorrow = moment(today).add(1, 'days');
-
             Action.findOne({'user._id': result._id}, {}, {sort: {'createdAt': -1}}, function (err, actions) {
-                //console.log(actions);
-                var match_schedule = function (newAction) {
-                    Schedule.find({'user._id': newAction.user._id, start: {"$gte": today.toDate(), "$lt": tomorrow.toDate()}}, {}, {sort:{'start': -1}}, function (err, shifts) {
-                        //console.log(shifts);
-                        if (shifts.length === 1) {
+                Schedule.find({
+                    'user._id': newAction.user._id,
+                    start: {"$gte": today.toDate(), "$lt": tomorrow.toDate()}
+                }, {}, {sort: {'start': -1}}, function (err, shifts) {
+                    var match_schedule = function (shift, newAction) {
 
-                            var shift = shifts[0];
+                        if (shift.end.getTime() - newAction.createdAt.getTime() <= bufferTime) {
 
-                            if (shift.end.getTime() - newAction.createdAt.getTime() <= bufferTime) {
+                            // STOP CHECKIN
+                            res.status(201);
+                            res.json({
+                                status: 201,
+                                err: "You shift is about to end"
+                            })
+                        }
+                        else if (Math.abs(newAction.createdAt.getTime() - shift.start.getTime()) <= bufferTime) {
 
-                                // STOP CHECKIN
-                                res.status(201);
-                                res.json({
-                                    status: 201,
-                                    err: "You shift is about to end"
-                                })
-                            }
-                            else if (Math.abs(newAction.createdAt.getTime() - shift.start.getTime()) <= bufferTime) {
+                            newAction.save();
+                            res.status(200);
+                            res.json({
+                                status: 200,
+                                message: "Successfully Checked In",
+                                token: result.name
 
-                                newAction.save();
-                                res.status(200);
-                                res.json({
-                                    status: 200,
-                                    message: "Successfully Checked In",
-                                    token: result.name
+                            })
+                        }
+                        else {
 
-                                })
-                            }
-                            else {
+                            newAction.type.push('late');
+                            newAction.save();
+                            res.status(200);
+                            res.json({
+                                status: 200,
+                                message: "Successfully Checked In Late",
+                                token: result.name
+                            })
+                        }
+                    };
+                    var allow_checkin = function (actions, newAction, shift) {
+                        if (actions == null) {
+                            match_schedule(shift, newAction);
+                        }
+                        else if (actions.type.indexOf('checkin') == -1) {
+                            match_schedule(shift, newAction);
+                        }
+                        else {
+                            res.status(201);
+                            res.json({
+                                status: 201,
+                                err: "User is Checked In"
+                            });
+                        }
+                    };
+                    var find_shift = function(shift){
 
-                                newAction.type.push('late');
-                                newAction.save();
-                                res.status(200);
-                                res.json({
-                                    status: 200,
-                                    message: "Successfully Checked In Late",
-                                    token: result.name
-                                })
+                        if (shift.start.getTime() - bufferTime <= newAction.createdAt.getTime() && newAction.createdAt.getTime() <= shift.end.getTime() + bufferTime) {
+
+                            allow_checkin(actions, newAction, shift);
+                            return true;
+                        }
+                        return false;
+                    };
+                    if (shifts.length === 0){
+                        res.status(201);
+                        res.json({
+                            status: 201,
+                            err: "No shift today"
+                        });
+                    }
+                    else if (shifts.length === 1) {
+                        allow_checkin(actions, newAction, shifts[0]);
+                    }
+                    else if (shifts.length > 1) {
+                        for (var i = 0; i < shifts.length; i++) {
+                            if(find_shift(shifts[i])){
+                                break;
                             }
                         }
-                    })
-                };
-                if (actions == null) {
-                    match_schedule(newAction);
-                }
-                else if (actions.type.indexOf('checkin') == -1) {
+                    }
 
-                        match_schedule(newAction);
-
-                }
-
-                else {
-                    res.status(201);
-                    res.json({
-                        status: 201,
-                        err: "User is Checked In"
-                    });
-                }
+                });
             });
         }
     });

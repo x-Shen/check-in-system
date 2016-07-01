@@ -21,7 +21,7 @@ var TOKEN_PATH = TOKEN_DIR + 'calendar-nodejs-quickstart.json';
 var CronJob = require('cron').CronJob;
 
 var job = new CronJob({
-    cronTime: '00 38 10 * * 1-5',
+    cronTime: '00 20 15 * * 1-5',
     onTick: function () {
         // Load client secrets from a local file.
         fs.readFile('client_secret.json', function processClientSecrets(err, content) {
@@ -126,7 +126,7 @@ function listEvents(auth) {
     console.log(next_day);
     calendar.events.list({
         auth: auth,
-        calendarId: '1t8dl0sqarrudmiqutl36er5bo@group.calendar.google.com',
+        calendarId: 'uci.edu_gk1s7c19lkft8oujtei68pre68@group.calendar.google.com',
         timeMin: (new Date()).toISOString(),
         timeMax: next_day.toISOString(),
         maxResults: 50,
