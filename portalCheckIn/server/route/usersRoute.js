@@ -7,10 +7,7 @@ Action = require('../model/actionModel');
 Schedule = require('../model/scheduleModel');
 
 router.post('/checkin', function (req, res) {
-
-    var now = moment(); //Capture the current moment
-    var nowDate = now.local().toDate(); //Convert the moment to a date object
-    var date = nowDate.getDate();
+    
     var bufferTime = 6 * 60 * 1000; //6 minutes in milliseconds
 
     User.findOne(req.body, function (err, result) {
@@ -26,20 +23,20 @@ router.post('/checkin', function (req, res) {
             var newAction = new Action();
             newAction.type.push('checkin');
             newAction.user = {_id: result._id, name: result.name};
-            newAction.createdAt = nowDate;
+            //newAction.createdAt = nowDate;
             var today = moment().startOf('day');
             var tomorrow = moment(today).add(1, 'days');
 
             Action.findOne({'user._id': result._id}, {}, {sort: {'createdAt': -1}}, function (err, actions) {
                 //console.log(actions);
-                var match_schedule = function (newAction, nowDate) {
+                var match_schedule = function (newAction) {
                     Schedule.find({'user._id': newAction.user._id, start: {"$gte": today.toDate(), "$lt": tomorrow.toDate()}}, {}, {sort:{'start': -1}}, function (err, shifts) {
                         //console.log(shifts);
                         if (shifts.length === 1) {
 
                             var shift = shifts[0];
 
-                            if (shift.end.getTime() - nowDate.getTime() <= bufferTime) {
+                            if (shift.end.getTime() - newAction.createdAt.getTime() <= bufferTime) {
 
                                 // STOP CHECKIN
                                 res.status(201);
@@ -48,7 +45,7 @@ router.post('/checkin', function (req, res) {
                                     err: "You shift is about to end"
                                 })
                             }
-                            else if (Math.abs(nowDate.getTime() - shift.start.getTime()) <= bufferTime) {
+                            else if (Math.abs(newAction.createdAt.getTime() - shift.start.getTime()) <= bufferTime) {
 
                                 newAction.save();
                                 res.status(200);
@@ -74,11 +71,11 @@ router.post('/checkin', function (req, res) {
                     })
                 };
                 if (actions == null) {
-                    match_schedule(newAction,nowDate);
+                    match_schedule(newAction);
                 }
                 else if (actions.type.indexOf('checkin') == -1) {
 
-                        match_schedule(newAction,nowDate);
+                        match_schedule(newAction);
 
                 }
 
