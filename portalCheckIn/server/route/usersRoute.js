@@ -6,6 +6,65 @@ var express = require('express'),
 Action = require('../model/actionModel');
 Schedule = require('../model/scheduleModel');
 
+var match_schedule = function (shift, newAction) {
+
+    if (shift.end.getTime() - newAction.createdAt.getTime() <= bufferTime) {
+
+        // STOP CHECKIN
+        res.status(201);
+        res.json({
+            status: 201,
+            err: "You shift is about to end"
+        })
+    }
+    else if (Math.abs(newAction.createdAt.getTime() - shift.start.getTime()) <= bufferTime) {
+
+        newAction.save();
+        res.status(200);
+        res.json({
+            status: 200,
+            message: "Successfully Checked In",
+            token: result.name
+
+        })
+    }
+    else {
+
+        newAction.type.push('late');
+        newAction.save();
+        res.status(200);
+        res.json({
+            status: 200,
+            message: "Successfully Checked In Late",
+            token: result.name
+        })
+    }
+};
+var allow_checkin = function (actions, newAction, shift) {
+    if (actions == null) {
+        match_schedule(shift, newAction);
+    }
+    else if (actions.type.indexOf('checkin') == -1) {
+        match_schedule(shift, newAction);
+    }
+    else {
+        res.status(201);
+        res.json({
+            status: 201,
+            err: "User is Checked In"
+        });
+    }
+};
+var find_shift = function(shift){
+
+    if (shift.start.getTime() - bufferTime <= newAction.createdAt.getTime() && newAction.createdAt.getTime() <= shift.end.getTime() + bufferTime) {
+
+        allow_checkin(actions, newAction, shift);
+        return true;
+    }
+    return false;
+};
+
 router.post('/checkin', function (req, res) {
 
     var bufferTime = 6 * 60 * 1000; //6 minutes in milliseconds
@@ -31,64 +90,7 @@ router.post('/checkin', function (req, res) {
                     'user._id': newAction.user._id,
                     start: {"$gte": today.toDate(), "$lt": tomorrow.toDate()}
                 }, {}, {sort: {'start': -1}}, function (err, shifts) {
-                    var match_schedule = function (shift, newAction) {
-
-                        if (shift.end.getTime() - newAction.createdAt.getTime() <= bufferTime) {
-
-                            // STOP CHECKIN
-                            res.status(201);
-                            res.json({
-                                status: 201,
-                                err: "You shift is about to end"
-                            })
-                        }
-                        else if (Math.abs(newAction.createdAt.getTime() - shift.start.getTime()) <= bufferTime) {
-
-                            newAction.save();
-                            res.status(200);
-                            res.json({
-                                status: 200,
-                                message: "Successfully Checked In",
-                                token: result.name
-
-                            })
-                        }
-                        else {
-
-                            newAction.type.push('late');
-                            newAction.save();
-                            res.status(200);
-                            res.json({
-                                status: 200,
-                                message: "Successfully Checked In Late",
-                                token: result.name
-                            })
-                        }
-                    };
-                    var allow_checkin = function (actions, newAction, shift) {
-                        if (actions == null) {
-                            match_schedule(shift, newAction);
-                        }
-                        else if (actions.type.indexOf('checkin') == -1) {
-                            match_schedule(shift, newAction);
-                        }
-                        else {
-                            res.status(201);
-                            res.json({
-                                status: 201,
-                                err: "User is Checked In"
-                            });
-                        }
-                    };
-                    var find_shift = function(shift){
-
-                        if (shift.start.getTime() - bufferTime <= newAction.createdAt.getTime() && newAction.createdAt.getTime() <= shift.end.getTime() + bufferTime) {
-
-                            allow_checkin(actions, newAction, shift);
-                            return true;
-                        }
-                        return false;
-                    };
+                    
                     if (shifts.length === 0){
                         res.status(201);
                         res.json({
