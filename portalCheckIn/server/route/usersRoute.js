@@ -6,7 +6,9 @@ var express = require('express'),
 Action = require('../model/actionModel');
 Schedule = require('../model/scheduleModel');
 
-var match_schedule = function (shift, newAction) {
+var bufferTime = 6 * 60 * 1000; //6 minutes in milliseconds
+
+var match_schedule = function (shift, newAction,res,result) {
 
     if (shift.end.getTime() - newAction.createdAt.getTime() <= bufferTime) {
 
@@ -15,6 +17,14 @@ var match_schedule = function (shift, newAction) {
         res.json({
             status: 201,
             err: "You shift is about to end"
+        })
+    }
+    else if(shift.start.getTime()-newAction.createdAt.getTime() > bufferTime){
+
+        res.status(201);
+        res.json({
+            status: 201,
+            err: "You shift is not started yet"
         })
     }
     else if (Math.abs(newAction.createdAt.getTime() - shift.start.getTime()) <= bufferTime) {
@@ -40,12 +50,12 @@ var match_schedule = function (shift, newAction) {
         })
     }
 };
-var allow_checkin = function (actions, newAction, shift) {
+var allow_checkin = function (actions, newAction, shift,res,result) {
     if (actions == null) {
-        match_schedule(shift, newAction);
+        match_schedule(shift, newAction,res,result);
     }
     else if (actions.type.indexOf('checkin') == -1) {
-        match_schedule(shift, newAction);
+        match_schedule(shift, newAction,res,result);
     }
     else {
         res.status(201);
@@ -55,11 +65,11 @@ var allow_checkin = function (actions, newAction, shift) {
         });
     }
 };
-var find_shift = function(shift){
+var find_shift = function(shift,res,result){
 
     if (shift.start.getTime() - bufferTime <= newAction.createdAt.getTime() && newAction.createdAt.getTime() <= shift.end.getTime() + bufferTime) {
 
-        allow_checkin(actions, newAction, shift);
+        allow_checkin(actions, newAction, shift,res,result);
         return true;
     }
     return false;
@@ -67,12 +77,13 @@ var find_shift = function(shift){
 
 router.post('/checkin', function (req, res) {
 
-    var bufferTime = 6 * 60 * 1000; //6 minutes in milliseconds
+
 
     User.findOne(req.body, function (err, result) {
         //if user id does not exist, send an alert.
 
         if (result == null) {
+            console.log('inside user does not exist');
             res.status(202);
             res.json({
                 status: 202
@@ -90,8 +101,9 @@ router.post('/checkin', function (req, res) {
                     'user._id': newAction.user._id,
                     start: {"$gte": today.toDate(), "$lt": tomorrow.toDate()}
                 }, {}, {sort: {'start': -1}}, function (err, shifts) {
-                    
+
                     if (shifts.length === 0){
+
                         res.status(201);
                         res.json({
                             status: 201,
@@ -99,11 +111,11 @@ router.post('/checkin', function (req, res) {
                         });
                     }
                     else if (shifts.length === 1) {
-                        allow_checkin(actions, newAction, shifts[0]);
+                        allow_checkin(actions, newAction, shifts[0],res,result);
                     }
                     else if (shifts.length > 1) {
                         for (var i = 0; i < shifts.length; i++) {
-                            if(find_shift(shifts[i])){
+                            if(find_shift(shifts[i],res,result)){
                                 break;
                             }
                         }

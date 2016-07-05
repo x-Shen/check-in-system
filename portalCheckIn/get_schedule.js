@@ -14,14 +14,37 @@ var googleAuth = require('google-auth-library');
 var SCOPES = ['https://www.googleapis.com/auth/calendar.readonly'];
 var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
     process.env.USERPROFILE) + '/.credentials/';
+
 var TOKEN_PATH = TOKEN_DIR + 'calendar-nodejs-quickstart.json';
+
+var calendar_id = '1t8dl0sqarrudmiqutl36er5bo@group.calendar.google.com';
+
+var make_schedule = function (event) {
+    User.findOne({name: event.summary, studentId: event.description}, function (err, result) {
+        if (result != null) {
+            var schedule = new Schedule({
+                start: event.start.dateTime,
+                end: event.end.dateTime,
+                user: {
+                    name: event.summary,
+                    _id: result._id
+                }
+            });
+
+            console.log(schedule.user.name);
+
+            schedule.save();
+
+        }
+    });
+};
 
 //cron job: execute get data from API every 7 a.m.
 
 var CronJob = require('cron').CronJob;
 
 var job = new CronJob({
-    cronTime: '00 20 15 * * 1-5',
+    cronTime: '00 45 12 * * 1-5',
     onTick: function () {
         // Load client secrets from a local file.
         fs.readFile('client_secret.json', function processClientSecrets(err, content) {
@@ -120,13 +143,14 @@ function storeToken(token) {
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
 function listEvents(auth) {
+    console.log('list events');
     var calendar = google.calendar('v3');
     var next_day = new Date();
     next_day.setDate(next_day.getDate() + 1);
-    console.log(next_day);
+
     calendar.events.list({
         auth: auth,
-        calendarId: 'uci.edu_gk1s7c19lkft8oujtei68pre68@group.calendar.google.com',
+        calendarId: calendar_id,
         timeMin: (new Date()).toISOString(),
         timeMax: next_day.toISOString(),
         maxResults: 50,
@@ -143,27 +167,9 @@ function listEvents(auth) {
         } else {
             console.log('Upcoming events of the day:');
 
-            var make_schedule = function (event) {
-                User.findOne({name: event.summary}, function (err, result) {
-                    if (result != null) {
-                        var schedule = new Schedule({
-                            start: event.start.dateTime,
-                            end: event.end.dateTime,
-                            user: {
-                                name: event.summary,
-                                _id: result._id
-                            }
-                        });
 
-                        console.log(schedule.user.name);
-
-                        schedule.save();
-
-                    }
-                });
-            };
             for (var i = 0; i < events.length; i++) {
-
+                console.log(events[i]);
                 make_schedule(events[i]);
             }
 
