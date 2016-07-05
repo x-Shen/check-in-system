@@ -3,8 +3,8 @@ var express = require('express'),
     mongoose = require('mongoose'),
     User = require('../model/usersModel'),
     moment = require('moment');
-Action = require('../model/actionModel');
-Schedule = require('../model/scheduleModel');
+var Action = require('../model/actionModel');
+var Schedule = require('../model/scheduleModel');
 
 var bufferTime = 6 * 60 * 1000; //6 minutes in milliseconds
 
@@ -77,17 +77,12 @@ var find_shift = function(shift,res,result){
 
 router.post('/checkin', function (req, res) {
 
-
-
-    User.findOne(req.body, function (err, result) {
+    User.findOne({studentId: req.body.studentId}, function (err, result) {
         //if user id does not exist, send an alert.
 
         if (result == null) {
-            console.log('inside user does not exist');
-            res.status(202);
-            res.json({
-                status: 202
-            });
+            console.log('user does not exist with student id', req.body.studentId);
+            res.status(404).json({status:404});
         }
         else {
             var newAction = new Action();
@@ -97,10 +92,14 @@ router.post('/checkin', function (req, res) {
             var today = moment().startOf('day');
             var tomorrow = moment(today).add(1, 'days');
             Action.findOne({'user._id': result._id}, {}, {sort: {'createdAt': -1}}, function (err, actions) {
-                Schedule.find({
-                    'user._id': newAction.user._id,
-                    start: {"$gte": today.toDate(), "$lt": tomorrow.toDate()}
-                }, {}, {sort: {'start': -1}}, function (err, shifts) {
+                Schedule.find(
+                    {
+                        'user._id': newAction.user._id,
+                        start: {"$gte": today.toDate(), "$lt": tomorrow.toDate()}
+                    },
+                    {},
+                    {sort: {'start': -1}},
+                    function (err, shifts) {
 
                     if (shifts.length === 0){
 
